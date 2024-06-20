@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partners Management</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .logoo {
+      height: 100px;
+      width: 200px;
+      border: none;
+    }
+  </style>
+</head>
+<body onload="fetchLogo()">
+  <div class=" m-5">
+    <h1 class="text-center">Partners Management</h1>
+    <!-- <button class="btn btn-primary my-3" data-toggle="modal" data-target="#addPartnerModal">Add New Partner</button> -->
+    <div id="partnersList" class="row"></div>
+  </div>
+
+  <!-- Add Partner Modal -->
+  <div class="modal fade" id="addPartnerModal" tabindex="-1" role="dialog" aria-labelledby="addPartnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addPartnerModalLabel">Add New Partner</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="addPartnerForm" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <!-- <div class="form-group">
+              <label for="description">Description</label>
+              <input type="text" class="form-control" id="description" name="description" required>
+            </div> -->
+            <div class="form-group">
+              <label for="website">Website</label>
+              <input type="text" class="form-control" id="website" name="website">
+            </div>
+            <div class="form-group">
+              <label for="logo">Logo</label>
+              <input type="file" class="form-control" id="logo" name="logo" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Partner</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    function fetchLogo() {
+      $.ajax({
+        url: 'http://localhost:4000/api/partners',
+        type: 'GET',
+        success: function(response) {
+          let partnersList = $('#partnersList');
+          partnersList.empty();
+          response.reverse().forEach(partner => { // reverse the array to show the latest first
+            partnersList.append(`
+              <div class="col-md-3">
+                <div class="logoo">
+                  <img src="http://localhost:4000${partner.logo}" alt="${partner.name}">
+                </div>
+              </div>
+            `);
+          });
+        }
+      });
+    }
+
+    $(document).ready(function() {
+      $('#addPartnerForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = new FormData(this);
+
+        $.ajax({
+          url: 'http://localhost:4000/api/partners',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(response) {
+            $('#addPartnerModal').modal('hide');
+          },
+          error: function(err) {
+            console.error(err);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
